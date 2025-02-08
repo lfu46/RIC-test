@@ -22,3 +22,39 @@ ggsave(
   plot = boxplot_protein_raw,
   height = 3, width = 3, units = 'in', dpi = 1200
 )
+
+#sample loading normalization
+target_mean_protein_CL <- mean(colSums(RIC_01232025_result |> select(CL_1:CL_3)))
+norm_facs_protein_CL <- target_mean_protein_CL/colSums(RIC_01232025_result |> select(CL_1:CL_3))
+protein_CL_sl <- tibble(sweep(RIC_01232025_result |> select(CL_1:CL_3), 2, norm_facs_protein_CL, FUN = '*'))
+colnames(protein_CL_sl) <- c('CL_1_sl', 'CL_2_sl', 'CL_3_sl')
+
+target_mean_protein_noCL <- mean(colSums(RIC_01232025_result |> select(noCL_4:noCL_6)))
+norm_facs_protein_noCL <- target_mean_protein_noCL/colSums(RIC_01232025_result |> select(noCL_4:noCL_6))
+protein_noCL_sl <- tibble(sweep(RIC_01232025_result |> select(noCL_4:noCL_6), 2, norm_facs_protein_noCL, FUN = '*'))
+colnames(protein_noCL_sl) <- c('noCL_4_sl', 'noCL_5_sl', 'noCL_6_sl')
+
+RIC_01232025_result_raw_sl <- bind_cols(RIC_01232025_result, protein_CL_sl, protein_noCL_sl)
+write_xlsx(RIC_01232025_result_raw_sl, path = 'data_source/data_normalization/RIC_01232025_result_raw_sl.xlsx')
+
+#check the distribution of intensity of each sl channel
+boxplot_protein_raw_sl <- RIC_01232025_result_raw_sl |> 
+  select(CL_1_sl:noCL_6_sl) |> 
+  pivot_longer(cols = CL_1_sl:noCL_6_sl, names_to = 'Exp', values_to = 'Intensity') |> 
+  mutate(log2_intensity = log2(Intensity)) |> 
+  ggplot() +
+  geom_boxplot(
+    aes(x = factor(Exp, levels = c('CL_1_sl', 'CL_2_sl', 'CL_3_sl', 'noCL_4_sl', 'noCL_5_sl', 'noCL_6_sl')),
+        y = log2_intensity)
+  ) +
+  labs(x = '', y = expression(log[2]*'(intensity)')) +
+  theme(
+    axis.text.x = element_text(angle = 30, hjust = 1)
+  )
+
+ggsave(
+  filename = 'data_source/data_normalization/figures/boxplot_protein_raw_sl.tiff',
+  plot = boxplot_protein_raw_sl,
+  height = 3, width = 3, units = 'in', dpi = 1200
+)
+
