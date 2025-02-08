@@ -74,4 +74,23 @@ colnames(protein_tmm_noCL) <- c(
 RIC_01232025_result_raw_sl_tmm <- bind_cols(RIC_01232025_result_raw_sl, protein_tmm_CL, protein_tmm_noCL)
 write_xlsx(RIC_01232025_result_raw_sl_tmm, path = 'data_source/data_normalization/RIC_01232025_result_raw_sl_tmm.xlsx')
 
+#check the distribution of intensity of each sl tmm channel
+boxplot_protein_raw_sl_tmm <- RIC_01232025_result_raw_sl_tmm |> 
+  select(CL_1_sl_tmm:noCL_6_sl_tmm) |> 
+  pivot_longer(cols = CL_1_sl_tmm:noCL_6_sl_tmm, names_to = 'Exp', values_to = 'Intensity') |> 
+  mutate(log2_intensity = log2(Intensity)) |> 
+  ggplot() +
+  geom_boxplot(
+    aes(x = factor(Exp, levels = c('CL_1_sl_tmm', 'CL_2_sl_tmm', 'CL_3_sl_tmm', 'noCL_4_sl_tmm', 'noCL_5_sl_tmm', 'noCL_6_sl_tmm')),
+        y = log2_intensity)
+  ) +
+  labs(x = '', y = expression(log[2]*'(intensity)')) +
+  theme(
+    axis.text.x = element_text(angle = 30, hjust = 1)
+  )
 
+ggsave(
+  filename = 'data_source/data_normalization/figures/boxplot_protein_raw_sl_tmm.tiff',
+  plot = boxplot_protein_raw_sl_tmm,
+  height = 3, width = 3, units = 'in', dpi = 1200
+)
