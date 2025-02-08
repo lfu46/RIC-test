@@ -58,3 +58,20 @@ ggsave(
   height = 3, width = 3, units = 'in', dpi = 1200
 )
 
+#TMM normalization
+norm_facs_protein_sl_tmm_CL <- calcNormFactors(RIC_01232025_result_raw_sl |> select(CL_1_sl:CL_3_sl))
+protein_tmm_CL <- tibble(sweep(RIC_01232025_result_raw_sl |> select(CL_1_sl:CL_3_sl), 2, norm_facs_protein_sl_tmm_CL, FUN = "/"))
+colnames(protein_tmm_CL) <- c(
+  'CL_1_sl_tmm', 'CL_2_sl_tmm', 'CL_3_sl_tmm'
+)
+
+norm_facs_protein_sl_tmm_noCL <- calcNormFactors(RIC_01232025_result_raw_sl |> select(noCL_4_sl:noCL_6_sl))
+protein_tmm_noCL <- tibble(sweep(RIC_01232025_result_raw_sl |> select(noCL_4_sl:noCL_6_sl), 2, norm_facs_protein_sl_tmm_noCL, FUN = "/"))
+colnames(protein_tmm_noCL) <- c(
+  'noCL_4_sl_tmm', 'noCL_5_sl_tmm', 'noCL_6_sl_tmm'
+)
+
+RIC_01232025_result_raw_sl_tmm <- bind_cols(RIC_01232025_result_raw_sl, protein_tmm_CL, protein_tmm_noCL)
+write_xlsx(RIC_01232025_result_raw_sl_tmm, path = 'data_source/data_normalization/RIC_01232025_result_raw_sl_tmm.xlsx')
+
+
