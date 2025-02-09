@@ -4,7 +4,7 @@ lapply(packages_names, require, character.only = TRUE)
 
 #generate RNA binding protein list
 RBP_list <- RIC_01232025_result_toptable_tb |> 
-  filter(logFC > 1, adj.P.Val < 0.01) |> 
+  filter(logFC > 0.5, adj.P.Val < 0.01) |> 
   distinct(UniProt_Accession) |> 
   pull()
 
