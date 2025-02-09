@@ -20,7 +20,7 @@ volcano_plot_RIC_01232025 <- ggplot() +
     ),
     color = '#440154ff'
   ) +
-  labs(x = expression(log[2]*'(CL/noCL)'), y = expression(-log[10]*'(intensity)'))
+  labs(x = expression(log[2]*'(CL/noCL)'), y = expression(-log[10]*'(adjusted p value)'))
 
 ggsave(
   filename = 'volcano_plot_RIC_01232025.tiff',
